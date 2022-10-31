@@ -28,47 +28,52 @@ app.listen(port, () => {
 function csvToJSON(csvFilePath) {
     let csv = fs.readFileSync(csvFilePath);// reading csv
 
-    let csvAsArrayByRows = csv.toString().split("\n");// creating an array from CSV
+    // Getting the headers
+    let csvAsArrayByRows = csv.toString().split("\n");
     let headers = csvAsArrayByRows[0].split(","); // extracting headers
 
+    // Building new csv as a string without the header line
     let csvAsString = "";
-    for(let i = 1; i < csvAsArrayByRows.length-1; i++) {
+    for (let i = 1; i < csvAsArrayByRows.length - 1; i++) {
         csvAsString += (csvAsArrayByRows[i] + "\n");
     }
-    console.log(csvAsString);
 
+    // Creates an array where each element is a row from the CSV file
+    let csvAsArrayByValues = [];
+    let valueCounter = 0;
+    let inQuotes = false;
+    let valueRow = "";
+    for (let ch of csvAsString) {
+        // Toggles in quotes variable whenever quotes are encountered 
+        if (ch === '"') {
+            inQuotes = !inQuotes;
+        }
+        // If we are not in quotes replace the comma with a |
+        if (ch === ',' && !inQuotes) {
+            ch = '|'
+            valueCounter++;
+        }
+        // When a newline is encountered and we are on the last value in a row push the current row to the array and start over
+        if (ch === '\n' && valueCounter === headers.length-1 && !inQuotes) {
+            valueCounter = 0;
+            csvAsArrayByValues.push(valueRow);
+            valueRow = "";
+            continue;
+        }
+        // If the character is not a qoute than add the character to the string
+        if (ch !== '"') {
+            valueRow += ch
+        }
+    }
 
     // Creating JSON objects out of each row and adding them to and array that will contain all data in the CSV
     let csvAsJSON = [];
-    for(let i = 1; i < csvAsArrayByRows.length-1; i++) {
-        let obj = {};  
-
-        // Gets next row of values
-        let str = csvAsArrayByRows[i];
-        let s = '';
-
-        // Loop for sorting through values with multiple entrys seperated by commas 
-        let inQuotes = false;
-        for (let ch of str) {
-            // Toggles in quotes variable whenever quotes are encountered 
-            if (ch === '"') {
-                inQuotes = !inQuotes;
-            }
-            // If we are not in quotes replace the comma with a |
-            if (ch === ',' && !inQuotes) {
-                ch = '|'
-            }
-            // If the character is not a qoute than add the character to the string
-            if (ch !== '"') {
-                s += ch
-            }
-        }
-
-        let properties = s.split("|");
-
+    for (let i = 0; i < csvAsArrayByValues.length; i++) {
+        let obj = {};
+        let properties = csvAsArrayByValues[i].split("|");
         // Adds headers and properties to object and add it to JSON list
-        for(let j = 0; j<headers.length; j++) {
-            obj[headers[j]]=properties[j];
+        for (let j = 0; j < headers.length; j++) {
+            obj[headers[j]] = properties[j];
         }
         csvAsJSON.push(obj);
     }
