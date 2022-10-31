@@ -1,16 +1,19 @@
 const express = require('express');
 const mysql = require('mysql');
 const fs = require('fs');
+const { setTimeout } = require('timers');
 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'lab3db'
+    database: 'lab3db',
+    multipleStatements: true,
+    connectTimeout: 30000
 });
 
-buildDB();
 
+// Express
 const app = express();
 const port = 3000;
 
@@ -19,6 +22,7 @@ app.use('/', express.static('static'));
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
@@ -39,10 +43,11 @@ function csvToJSON(csvFilePath) {
     }
 
     // Creates an array where each element is a row from the CSV file
-    let csvAsArrayByValues = [];
     let valueCounter = 0;
     let inQuotes = false;
-    let valueRow = "";
+    let value = "";
+    let obj = {};
+    let csvAsJSON = [];
     for (let ch of csvAsString) {
         // Toggles in quotes variable whenever quotes are encountered 
         if (ch === '"') {
@@ -50,43 +55,206 @@ function csvToJSON(csvFilePath) {
         }
         // If we are not in quotes replace the comma with a |
         if (ch === ',' && !inQuotes) {
-            ch = '|'
+            obj[headers[valueCounter]] = value.trim();
+            value = "";
             valueCounter++;
-        }
-        // When a newline is encountered and we are on the last value in a row push the current row to the array and start over
-        if (ch === '\n' && valueCounter === headers.length-1 && !inQuotes) {
-            valueCounter = 0;
-            csvAsArrayByValues.push(valueRow);
-            valueRow = "";
             continue;
         }
-        // If the character is not a qoute than add the character to the string
+        // When a newline is encountered and we are on the last value in a row push the current row to the array and start over
+        if (ch === '\n' && valueCounter === headers.length - 1 && !inQuotes) {
+            obj[headers[headers.length - 1]] = value.trim();
+            csvAsJSON.push(obj);
+            obj = {};
+            value = "";
+            valueCounter = 0;
+            continue;
+        }
+        // add the character to the string
         if (ch !== '"') {
-            valueRow += ch
+            value += ch;
         }
-    }
-
-    // Creating JSON objects out of each row and adding them to and array that will contain all data in the CSV
-    let csvAsJSON = [];
-    for (let i = 0; i < csvAsArrayByValues.length; i++) {
-        let obj = {};
-        let properties = csvAsArrayByValues[i].split("|");
-        // Adds headers and properties to object and add it to JSON list
-        for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = properties[j];
-        }
-        csvAsJSON.push(obj);
     }
 
     return csvAsJSON;
 }
 
-function buildDB() {
-    db.connect();
+
+function buildGenresDB() {
+    db.query("DROP TABLE genres;", (err) => {
+            if (err) {
+                console.log("No Table to drop");
+            }
+            else {
+                console.log("Dropped Table");
+            }
+        }
+    );
+
+    db.query(
+        "CREATE TABLE genres (\n" +
+        "id int NOT NULL,\n" +
+        "numTracks int DEFAULT NULL,\n" +
+        "parent int DEFAULT NULL,\n" +
+        "title char(45) DEFAULT NULL,\n" +
+        "top_level int DEFAULT NULL,\n" +
+        "PRIMARY KEY (id)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Genre Table Created");
+        }
+    );
 
     let genres = csvToJSON("data/genres.csv");
-    let albums = csvToJSON("data/raw_albums.csv");
-    let artists = csvToJSON("data/raw_artists.csv");
-    let tracks = csvToJSON("data/raw_tracks.csv");
+    let i = 0;
+    for (let genre of genres) {
+        db.query("INSERT INTO genres VALUES (" +
+            genre.genre_id + ", " +
+            genre["#tracks"] + ", " +
+            genre.parent + ", " +
+            '"' + genre.title + '"' + ", " +
+            genre.top_level + ");", (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("Inserted genre " + genre.genre_id + " into genres table \t" + ((++i) / genres.length) * 100 + " \t%");
+            });
+    }
+}
 
+function buildAlbumsDB() {
+    db.query("DROP TABLE albums;", (err) => {
+            if (err) {
+                console.log("No Table to drop");
+            }
+            else {
+                console.log("Dropped Table");
+            }
+        }
+    );
+
+    db.query(
+        "CREATE TABLE albums (\n" +
+        "id int NOT NULL,\n" +
+        "name char(100) DEFAULT NULL,\n" +
+        "PRIMARY KEY (id)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Album Table Created");
+        }
+    );
+
+    let albums = csvToJSON("data/raw_albums.csv");
+    let i = 0;
+    for (let album of albums) {
+        db.query("INSERT INTO albums VALUES (" +
+            album.album_id + ", " +
+            '"' + album.album_handle.replaceAll('_', ' ') + '"' + ");", (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("Inserted album " + album.album_id + " into albums table \t" + ((++i) / albums.length) * 100 + " \t%");
+            });
+    }
+}
+
+function buildArtistsDB() {
+    db.query("DROP TABLE artists;", (err) => {
+            if (err) {
+                console.log("No Table to drop");
+            }
+            else {
+                console.log("Dropped Table");
+            }
+        }
+    );
+
+    db.query(
+        "CREATE TABLE artists (\n" +
+        "id int NOT NULL,\n" +
+        "name char(100) DEFAULT NULL,\n" +
+        "location char(100) DEFAULT NULL,\n" +
+        "favorites int DEFAULT NULL,\n" +
+        "dateCreated char(45) DEFAULT NULL,\n" +
+        "website char(200) DEFAULT NULL,\n" +
+        "associatedLabels text DEFAULT NULL,\n" +
+        "PRIMARY KEY (id)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Artists Table Created");
+        }
+    );
+
+    let artists = csvToJSON("data/raw_artists.csv");
+    let i = 0;
+    for (let artist of artists) {
+        db.query("INSERT INTO artists VALUES (" +
+            artist.artist_id + ", " +
+            '"' + artist.artist_handle.replaceAll('_', ' ') + '"' + ", " +
+            '"' + artist.artist_location.split('\n')[0].slice(0, 99) + '"' + ", " +
+            artist.artist_favorites + ", " +
+            '"' + artist.artist_date_created + '"' + ", " +
+            '"' + artist.artist_website + '"' + ", " +
+            '"' + artist.artist_associated_labels + '"' + ");", (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("Inserted artist " + artist.artist_id + " into artists table \t" + ((++i) / artists.length) * 100 + " \t%");
+            });
+    }
+}
+
+function buildTracksDB() {
+    db.query("DROP TABLE tracks;", (err) => {
+            if (err) {
+                console.log("No Table to drop");
+            }
+            else {
+                console.log("Dropped Table");
+            }
+        }
+    );
+    
+    db.query(
+        "CREATE TABLE tracks (\n" +
+        "id int NOT NULL,\n" +
+        "albumID int DEFAULT NULL,\n" +
+        "artistID int DEFAULT NULL,\n" +
+        "tags text DEFAULT NULL,\n" +
+        "dateCreated char(45) DEFAULT NULL,\n" +
+        "dateRecorded char(45) DEFAULT NULL,\n" +
+        "duration char(45) DEFAULT NULL,\n" +
+        "genres char(100) DEFAULT NULL,\n" +
+        "number int DEFAULT NULL,\n" +
+        "title char(200) DEFAULT NULL,\n" +
+        "PRIMARY KEY (id)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Tracks Table Created");
+        }
+    );
+
+    let tracks = csvToJSON("data/raw_tracks.csv");
+    let i = 0;
+    for (let track of tracks) {
+        db.query("INSERT INTO tracks VALUES (" +
+            track.track_id + ", " +
+            ((track.album_id === '') ? "null" : track.album_id) + ", " +
+            track.artist_id + ", " +
+            '"' + track.tags + '"' + ", " +
+            '"' + track.track_date_created + '"' + ", " +
+            '"' + track.track_date_recorded + '"' + ", " +
+            '"' + track.track_duration + '"' + ", " +
+            '"' + track.genres + '"' + ", " +
+            track.track_number + ", " +
+            '"' + track.track_title.replace(/[;\\]/g, "").trim() + '"' + ");", (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log("Inserted track " + track.track_id + " into tracks table \t" + ((++i) / tracks.length) * 100 + " \t%");
+            });
+    }
 }
