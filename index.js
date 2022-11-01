@@ -53,7 +53,7 @@ trackRouter.get('', (req, res) => {
 
     // Functions for sending response after db query
     const queryRes = (err, data) => {
-        if (data = []) {
+        if (data === []) {
             res.status(404).send("Not Found");
         }
         else if (err) {
@@ -81,7 +81,6 @@ trackRouter.get('', (req, res) => {
     }
     // Album name where recived
     else if (trackTitle === "" && albumName !== "") {
-        console.log("Recived album");
         db.query('SELECT tracks.trackID,tracks.albumID,' +
             'albums.albumName,tracks.artistID,' +
             'artists.artistName,tracks.trackTags,' +
@@ -96,7 +95,6 @@ trackRouter.get('', (req, res) => {
     }
     // Title name where recived
     else if (trackTitle !== "" && albumName === "") {
-        console.log("Recived track");
         db.query('SELECT tracks.trackID,tracks.albumID,' +
             'albums.albumName,tracks.artistID,' +
             'artists.artistName,tracks.trackTags,' +
