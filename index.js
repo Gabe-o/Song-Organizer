@@ -11,20 +11,121 @@ const db = mysql.createConnection({
     connectTimeout: 30000
 });
 
-
 // Express
 const app = express();
 const port = 3000;
 
+// For serving static front end
 app.use('/', express.static('static'));
 
-// Resets the db
+// For logging requests
+app.use((req, res, next) => { // for all routes
+    console.log('Request: ', req.method, ' \tPath: ', req.url);
+    next(); // keep going
+});
+
+// Resets the db (THIS TAKES LIKE ~5 MINUTES TO COMPLETE IF YOU RUN IT)
 app.get('/resetDB', (req, res) => {
     buildGenresDB();
     buildAlbumsDB();
     buildArtistsDB();
     buildTracksDB();
-    res.redirect('static/index.html');
+    res.redirect('index.html');
+});
+
+const artistRouter = express.Router();
+app.use('/api/artists', artistRouter);
+
+artistRouter.get('/:id', (req, res) => {
+    const id = req.params.id;
+    db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
+        res.send(data[0]);
+    });
+});
+
+const trackRouter = express.Router();
+app.use('/api/tracks', trackRouter);
+
+trackRouter.get('', (req, res) => {
+    const trackTitle = req.query.trackTitle;
+    const albumName = req.query.albumName;
+    const results = req.query.results;
+
+    // Functions for sending response after db query
+    const queryRes = (err, data) => {
+        if (data = []) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data);
+        }
+    }
+
+    // Track title and album name was recived
+    if (trackTitle !== "" && albumName !== "") {
+        db.query('SELECT tracks.trackID,tracks.albumID,' +
+            'albums.albumName,tracks.artistID,' +
+            'artists.artistName,tracks.trackTags,' +
+            'tracks.trackDateCreated,tracks.trackDateRecorded,' +
+            'tracks.trackDuration,tracks.trackGenres,' +
+            'tracks.trackNumber,tracks.trackTitle ' +
+            'FROM tracks ' +
+            'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
+            'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
+            'WHERE tracks.trackTitle LIKE ' + "'%" + trackTitle + "%'" +
+            'AND albums.albumName LIKE ' + "'%" + albumName + "%' " +
+            "LIMIT " + results + ";", queryRes);
+    }
+    // Album name where recived
+    else if (trackTitle === "" && albumName !== "") {
+        console.log("Recived album");
+        db.query('SELECT tracks.trackID,tracks.albumID,' +
+            'albums.albumName,tracks.artistID,' +
+            'artists.artistName,tracks.trackTags,' +
+            'tracks.trackDateCreated,tracks.trackDateRecorded,' +
+            'tracks.trackDuration,tracks.trackGenres,' +
+            'tracks.trackNumber,tracks.trackTitle ' +
+            'FROM tracks ' +
+            'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
+            'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
+            'WHERE albums.albumName LIKE ' + "'%" + albumName + "%' " +
+            "LIMIT " + results + ";", queryRes);
+    }
+    // Title name where recived
+    else if (trackTitle !== "" && albumName === "") {
+        console.log("Recived track");
+        db.query('SELECT tracks.trackID,tracks.albumID,' +
+            'albums.albumName,tracks.artistID,' +
+            'artists.artistName,tracks.trackTags,' +
+            'tracks.trackDateCreated,tracks.trackDateRecorded,' +
+            'tracks.trackDuration,tracks.trackGenres,' +
+            'tracks.trackNumber,tracks.trackTitle ' +
+            'FROM tracks ' +
+            'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
+            'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
+            'WHERE tracks.trackTitle LIKE ' + "'%" + trackTitle + "%' " +
+            "LIMIT " + results + ";", queryRes);
+    }
+});
+
+trackRouter.get('/:id', (req, res) => {
+    const id = req.params.id;
+    db.query('SELECT tracks.trackID,tracks.albumID,' +
+        'albums.albumName,tracks.artistID,' +
+        'artists.artistName,tracks.trackTags,' +
+        'tracks.trackDateCreated,tracks.trackDateRecorded,' +
+        'tracks.trackDuration,tracks.trackGenres,' +
+        'tracks.trackNumber,tracks.trackTitle ' +
+        'FROM tracks ' +
+        'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
+        'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
+        'WHERE tracks.trackID=' + id +
+        " LIMIT 1;", (err, data) => {
+            res.send(data[0]);
+        });
 });
 
 app.listen(port, () => {
@@ -86,24 +187,24 @@ function csvToJSON(csvFilePath) {
 function buildGenresDB() {
     // Deletes the table if one already exists
     db.query("DROP TABLE genres;", (err) => {
-            if (err) {
-                console.log("No Table to drop");
-            }
-            else {
-                console.log("Dropped Table");
-            }
+        if (err) {
+            console.log("No Table to drop");
         }
+        else {
+            console.log("Dropped Table");
+        }
+    }
     );
 
     // Creates new Table
     db.query(
         "CREATE TABLE genres (\n" +
-        "id int NOT NULL,\n" +
-        "numTracks int DEFAULT NULL,\n" +
-        "parent int DEFAULT NULL,\n" +
-        "title char(45) DEFAULT NULL,\n" +
-        "top_level int DEFAULT NULL,\n" +
-        "PRIMARY KEY (id)\n);\n", (err) => {
+        "genreID int NOT NULL,\n" +
+        "genreNumTracks int DEFAULT NULL,\n" +
+        "genreParent int DEFAULT NULL,\n" +
+        "genreTitle char(45) DEFAULT NULL,\n" +
+        "genreTopLevel int DEFAULT NULL,\n" +
+        "PRIMARY KEY (genreID)\n);\n", (err) => {
             if (err) {
                 throw err;
             }
@@ -133,21 +234,21 @@ function buildGenresDB() {
 function buildAlbumsDB() {
     // Deletes the table if one already exists
     db.query("DROP TABLE albums;", (err) => {
-            if (err) {
-                console.log("No Table to drop");
-            }
-            else {
-                console.log("Dropped Table");
-            }
+        if (err) {
+            console.log("No Table to drop");
         }
+        else {
+            console.log("Dropped Table");
+        }
+    }
     );
 
     // Creates new table
     db.query(
         "CREATE TABLE albums (\n" +
-        "id int NOT NULL,\n" +
-        "name char(100) DEFAULT NULL,\n" +
-        "PRIMARY KEY (id)\n);\n", (err) => {
+        "albumID int NOT NULL,\n" +
+        "albumName char(100) DEFAULT NULL,\n" +
+        "PRIMARY KEY (albumID)\n);\n", (err) => {
             if (err) {
                 throw err;
             }
@@ -174,26 +275,26 @@ function buildAlbumsDB() {
 function buildArtistsDB() {
     // Deletes the table if one already exists
     db.query("DROP TABLE artists;", (err) => {
-            if (err) {
-                console.log("No Table to drop");
-            }
-            else {
-                console.log("Dropped Table");
-            }
+        if (err) {
+            console.log("No Table to drop");
         }
+        else {
+            console.log("Dropped Table");
+        }
+    }
     );
 
     // Creates new table
     db.query(
         "CREATE TABLE artists (\n" +
-        "id int NOT NULL,\n" +
-        "name char(100) DEFAULT NULL,\n" +
-        "location char(100) DEFAULT NULL,\n" +
-        "favorites int DEFAULT NULL,\n" +
-        "dateCreated char(45) DEFAULT NULL,\n" +
-        "website char(200) DEFAULT NULL,\n" +
-        "associatedLabels text DEFAULT NULL,\n" +
-        "PRIMARY KEY (id)\n);\n", (err) => {
+        "artistID int NOT NULL,\n" +
+        "artistName char(100) DEFAULT NULL,\n" +
+        "artistLocation char(100) DEFAULT NULL,\n" +
+        "artistFavorites int DEFAULT NULL,\n" +
+        "artistDateCreated char(45) DEFAULT NULL,\n" +
+        "artistWebsite char(200) DEFAULT NULL,\n" +
+        "artistAssociatedLabels text DEFAULT NULL,\n" +
+        "PRIMARY KEY (artistID)\n);\n", (err) => {
             if (err) {
                 throw err;
             }
@@ -225,29 +326,29 @@ function buildArtistsDB() {
 function buildTracksDB() {
     // Deletes table if one already exists
     db.query("DROP TABLE tracks;", (err) => {
-            if (err) {
-                console.log("No Table to drop");
-            }
-            else {
-                console.log("Dropped Table");
-            }
+        if (err) {
+            console.log("No Table to drop");
         }
+        else {
+            console.log("Dropped Table");
+        }
+    }
     );
-    
+
     // Creates new table
     db.query(
         "CREATE TABLE tracks (\n" +
-        "id int NOT NULL,\n" +
+        "trackID int NOT NULL,\n" +
         "albumID int DEFAULT NULL,\n" +
         "artistID int DEFAULT NULL,\n" +
-        "tags text DEFAULT NULL,\n" +
-        "dateCreated char(45) DEFAULT NULL,\n" +
-        "dateRecorded char(45) DEFAULT NULL,\n" +
-        "duration char(45) DEFAULT NULL,\n" +
-        "genres char(100) DEFAULT NULL,\n" +
-        "number int DEFAULT NULL,\n" +
-        "title char(200) DEFAULT NULL,\n" +
-        "PRIMARY KEY (id)\n);\n", (err) => {
+        "trackTags text DEFAULT NULL,\n" +
+        "trackDateCreated char(45) DEFAULT NULL,\n" +
+        "trackDateRecorded char(45) DEFAULT NULL,\n" +
+        "trackDuration char(45) DEFAULT NULL,\n" +
+        "trackGenres char(100) DEFAULT NULL,\n" +
+        "trackNumber int DEFAULT NULL,\n" +
+        "trackTitle char(200) DEFAULT NULL,\n" +
+        "PRIMARY KEY (trackID)\n);\n", (err) => {
             if (err) {
                 throw err;
             }
