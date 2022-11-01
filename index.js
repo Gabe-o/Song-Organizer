@@ -33,19 +33,31 @@ app.get('/resetDB', (req, res) => {
     res.redirect('index.html');
 });
 
+// Routes requests for /api/artists
 const artistRouter = express.Router();
 app.use('/api/artists', artistRouter);
 
+// Querys db for a given artist id and returns 1 result
 artistRouter.get('/:id', (req, res) => {
     const id = req.params.id;
     db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
-        res.send(data[0]);
+        if (data === []) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data[0]);
+        }
     });
 });
 
+// Routes requests for /api/tracks
 const trackRouter = express.Router();
 app.use('/api/tracks', trackRouter);
 
+// Querys db for given trackTitle and/or albumName and returns specified number of results
 trackRouter.get('', (req, res) => {
     const trackTitle = req.query.trackTitle;
     const albumName = req.query.albumName;
@@ -79,7 +91,7 @@ trackRouter.get('', (req, res) => {
             'AND albums.albumName LIKE ' + "'%" + albumName + "%' " +
             "LIMIT " + results + ";", queryRes);
     }
-    // Album name where recived
+    // Album name was recived
     else if (trackTitle === "" && albumName !== "") {
         db.query('SELECT tracks.trackID,tracks.albumID,' +
             'albums.albumName,tracks.artistID,' +
@@ -93,7 +105,7 @@ trackRouter.get('', (req, res) => {
             'WHERE albums.albumName LIKE ' + "'%" + albumName + "%' " +
             "LIMIT " + results + ";", queryRes);
     }
-    // Title name where recived
+    // Track title was recived
     else if (trackTitle !== "" && albumName === "") {
         db.query('SELECT tracks.trackID,tracks.albumID,' +
             'albums.albumName,tracks.artistID,' +
@@ -109,6 +121,7 @@ trackRouter.get('', (req, res) => {
     }
 });
 
+// Querys db for given track id and returns 1 result
 trackRouter.get('/:id', (req, res) => {
     const id = req.params.id;
     db.query('SELECT tracks.trackID,tracks.albumID,' +
@@ -122,14 +135,22 @@ trackRouter.get('/:id', (req, res) => {
         'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
         'WHERE tracks.trackID=' + id +
         " LIMIT 1;", (err, data) => {
-            res.send(data[0]);
+            if (data === []) {
+                res.status(404).send("Not Found");
+            }
+            else if (err) {
+                res.status(500).send(err);
+            }
+            else {
+                res.send(data[0]);
+            }
         });
 });
 
+// Listening for requests on given port
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 });
-
 
 // Takes a CVS file and converts it to a JSON object
 function csvToJSON(csvFilePath) {
