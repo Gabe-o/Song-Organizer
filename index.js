@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql');
 const fs = require('fs');
-const { setTimeout } = require('timers');
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -19,14 +18,19 @@ const port = 3000;
 
 app.use('/', express.static('static'));
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+// Resets the db
+app.get('/resetDB', (req, res) => {
+    buildGenresDB();
+    buildAlbumsDB();
+    buildArtistsDB();
+    buildTracksDB();
+    res.redirect('static/index.html');
 });
-
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 });
+
 
 // Takes a CVS file and converts it to a JSON object
 function csvToJSON(csvFilePath) {
@@ -78,8 +82,9 @@ function csvToJSON(csvFilePath) {
     return csvAsJSON;
 }
 
-
+// Builds Genres table from CSV file
 function buildGenresDB() {
+    // Deletes the table if one already exists
     db.query("DROP TABLE genres;", (err) => {
             if (err) {
                 console.log("No Table to drop");
@@ -90,6 +95,7 @@ function buildGenresDB() {
         }
     );
 
+    // Creates new Table
     db.query(
         "CREATE TABLE genres (\n" +
         "id int NOT NULL,\n" +
@@ -105,6 +111,7 @@ function buildGenresDB() {
         }
     );
 
+    // Adds genres from CSV file to the db
     let genres = csvToJSON("data/genres.csv");
     let i = 0;
     for (let genre of genres) {
@@ -122,7 +129,9 @@ function buildGenresDB() {
     }
 }
 
+// Builds Albums table from CSV file
 function buildAlbumsDB() {
+    // Deletes the table if one already exists
     db.query("DROP TABLE albums;", (err) => {
             if (err) {
                 console.log("No Table to drop");
@@ -133,6 +142,7 @@ function buildAlbumsDB() {
         }
     );
 
+    // Creates new table
     db.query(
         "CREATE TABLE albums (\n" +
         "id int NOT NULL,\n" +
@@ -145,6 +155,7 @@ function buildAlbumsDB() {
         }
     );
 
+    // Adds albums from CSV to the db
     let albums = csvToJSON("data/raw_albums.csv");
     let i = 0;
     for (let album of albums) {
@@ -159,7 +170,9 @@ function buildAlbumsDB() {
     }
 }
 
+// Builds Artists table from CSV file
 function buildArtistsDB() {
+    // Deletes the table if one already exists
     db.query("DROP TABLE artists;", (err) => {
             if (err) {
                 console.log("No Table to drop");
@@ -170,6 +183,7 @@ function buildArtistsDB() {
         }
     );
 
+    // Creates new table
     db.query(
         "CREATE TABLE artists (\n" +
         "id int NOT NULL,\n" +
@@ -187,6 +201,7 @@ function buildArtistsDB() {
         }
     );
 
+    // Adds artists from the CSV file to the db
     let artists = csvToJSON("data/raw_artists.csv");
     let i = 0;
     for (let artist of artists) {
@@ -206,7 +221,9 @@ function buildArtistsDB() {
     }
 }
 
+// Builds Tracks table from CSV file
 function buildTracksDB() {
+    // Deletes table if one already exists
     db.query("DROP TABLE tracks;", (err) => {
             if (err) {
                 console.log("No Table to drop");
@@ -217,6 +234,7 @@ function buildTracksDB() {
         }
     );
     
+    // Creates new table
     db.query(
         "CREATE TABLE tracks (\n" +
         "id int NOT NULL,\n" +
@@ -237,6 +255,7 @@ function buildTracksDB() {
         }
     );
 
+    // Adds Tracks from CSV file to the db
     let tracks = csvToJSON("data/raw_tracks.csv");
     let i = 0;
     for (let track of tracks) {
