@@ -7,6 +7,10 @@ body {
     color: white;
 }
 
+form {
+    margin-top: 1vmax;
+}
+
 div.songDisplay {
     width: 90vmax;
     left: 10vmax;

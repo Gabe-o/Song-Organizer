@@ -7,7 +7,16 @@
     </head>
     <body>
         <div class="sideBar">
-            <p>Hello</p>
+            <form id="artistSearch">
+                <label for="artistInput">Search Artists:</label><br>
+                <input type="text" id="artistInput" name="artistName"><br>
+            </form>
+            <form id="trackSearch">
+                <label for="trackInput">Search Tracks:</label><br>
+                <input type="text" id="trackInput" name="trackTitle"><br>
+                <label for="albumInput">Search Albums:</label><br>
+                <input type="text" id="albumInput" name="albumName"><br>
+            </form>
         </div>
         <div class="songDisplay">
             <table>
@@ -27,6 +36,7 @@
                     <td class="addToList"></td>
                 </tr>
             </table>
+        </div>
         <div class="topBar">
             <table>
                 <tr>
