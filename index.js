@@ -257,7 +257,7 @@ function buildAlbumsDB() {
             for (let album of albums) {
                 db.query("INSERT INTO albums VALUES (" +
                     album.album_id + ", " +
-                    '"' + album.album_handle.replace(/[_"]/, ' ').trim() + '"' + ");", (err) => {
+                    '"' + album.album_handle.replace(/[_"]/g, ' ').trim() + '"' + ");", (err) => {
                         if (err) {
                             throw err;
                         }
@@ -308,7 +308,7 @@ function buildArtistsDB() {
             for (let artist of artists) {
                 db.query("INSERT INTO artists VALUES (" +
                     artist.artist_id + ", " +
-                    '"' + artist.artist_handle.replace(/[_"]/, ' ').trim() + '"' + ", " +
+                    '"' + artist.artist_handle.replace(/[_"]/g, ' ').trim() + '"' + ", " +
                     '"' + artist.artist_location.replaceAll('"',"").split('\n')[0].slice(0, 99) + '"' + ", " +
                     artist.artist_favorites + ", " +
                     '"' + artist.artist_date_created.replaceAll('"',"") + '"' + ", " +
