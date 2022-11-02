@@ -187,10 +187,15 @@ listRouter.post('', (req, res) => {
     const listName = req.body.listName;
 
     db.query("INSERT INTO lists (listName) VALUES ('" + listName + "')", (err, data) => {
-        if(err) {
+        if(err.code === 'ER_DUP_ENTRY') {
+            res.status(422).send(err.sqlMessage);
+        }
+        else if(err) {
             throw err;
         }
-        res.send(data);
+        else {
+            res.send(data);
+        }
     });
 });
 
