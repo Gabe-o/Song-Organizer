@@ -13,10 +13,17 @@ artistForm.addEventListener("submit", (e) => {
     })
         .then(httpResp => httpResp.json())
         .then(data => {
+            // Toggles headers
             document.getElementById("artistHeaders").style.display = "table";
             document.getElementById("trackHeaders").style.display = "none";
 
-            console.log(data);
+            // Appends Data
+            let table = document.getElementById("infoTable");
+            table.textContent = "";
+
+            for (let artist of data) {
+                table.appendChild(createArtistTableRow(artist));
+            }
         })
         .catch(err => {
             throw err;
@@ -42,6 +49,7 @@ trackForm.addEventListener("keypress", (e) => {
         })
             .then(httpResp => httpResp.json())
             .then(data => {
+                // Toggles Headers
                 document.getElementById("artistHeaders").style.display = "none";
                 document.getElementById("trackHeaders").style.display = "table";
 
@@ -146,6 +154,54 @@ function createTrackTableRow(trackData) {
     td = document.createElement("td");
     td.className = "addToList";
     td.appendChild(document.createTextNode(""));
+    tr.appendChild(td);
+
+    return tr;
+}
+
+function createArtistTableRow(artistData) {
+    let tr = document.createElement("tr");
+
+    // Adds artist id
+    td = document.createElement("td");
+    td.className = "artistID";
+    td.appendChild(document.createTextNode(artistData.artistID));
+    tr.appendChild(td);
+
+    // Adds artist name
+    td = document.createElement("td");
+    td.className = "artistName";
+    td.appendChild(document.createTextNode(artistData.artistName));
+    tr.appendChild(td);
+
+    // Adds artist location
+    td = document.createElement("td");
+    td.className = "artistLocation";
+    td.appendChild(document.createTextNode(artistData.artistLocation));
+    tr.appendChild(td);
+
+    // Adds artist favorites
+    td = document.createElement("td");
+    td.className = "artistFavorites";
+    td.appendChild(document.createTextNode(artistData.artistFavorites));
+    tr.appendChild(td);
+
+    // Adds artist date created
+    td = document.createElement("td");
+    td.className = "artistDateCreated";
+    td.appendChild(document.createTextNode(artistData.artistDateCreated));
+    tr.appendChild(td);
+
+    // Adds artist website
+    td = document.createElement("td");
+    td.className = "artistWebsite";
+    td.appendChild(document.createTextNode(artistData.artistWebsite));
+    tr.appendChild(td);
+
+    // Adds artist associated labels
+    td = document.createElement("td");
+    td.className = "artistAssociatedLabels";
+    td.appendChild(document.createTextNode(artistData.artistAssociatedLabels));
     tr.appendChild(td);
 
     return tr;

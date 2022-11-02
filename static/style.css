@@ -50,6 +50,7 @@ table#artistHeaders {
 
 td {
     text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .trackID {
@@ -116,12 +117,10 @@ td {
 
 .artistFavorites {
     width: 4%;
-    text-align: left;
 }
 
 .artistDateCreated {
     width: 7%;
-    text-align: left;
 }
 
 .artistWebsite {
