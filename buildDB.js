@@ -244,14 +244,15 @@ function buildListsDB() {
             console.log("Dropped Table");
         }
     }
-    );
+    );  
 
     // Creates new table
     db.query( 
         "CREATE TABLE lists (\n" +
         "listID int NOT NULL AUTO_INCREMENT,\n" +
-        "listName VARCHAR(255) DEFAULT NULL,\n" +
-        "PRIMARY KEY (listID)\n);\n", (err) => {
+        "listName VARCHAR(255) NOT NULL,\n" +
+        "PRIMARY KEY (listID),\n" +
+        "UNIQUE KEY listName_UNIQUE (listName));\n", (err) => {
             if (err) {
                 throw err;
             }
