@@ -10,10 +10,10 @@ const db = mysql.createConnection({
     multipleStatements: true
 });
 
-// buildGenresDB();
-// buildAlbumsDB();
-// buildArtistsDB();
-// buildTracksDB();
+buildGenresDB();
+buildAlbumsDB();
+buildArtistsDB();
+buildTracksDB();
 buildListsDB();
 buildListTrackDetailsDB();
 
