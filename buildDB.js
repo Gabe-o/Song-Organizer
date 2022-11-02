@@ -249,11 +249,10 @@ function buildListsDB() {
     // Creates new table
     db.query( 
         "CREATE TABLE lists (\n" +
-        "listID int NOT NULL AUTO_INCREMENT,\n" +
         "listName VARCHAR(255) NOT NULL,\n" +
         "numTracks int DEFAULT NULL,\n" +
         "totalDuration int DEFAULT NULL,\n" +
-        "PRIMARY KEY (listID),\n" +
+        "PRIMARY KEY (listName),\n" +
         "UNIQUE KEY listName_UNIQUE (listName));\n", (err) => {
             if (err) {
                 throw err;
@@ -279,9 +278,9 @@ function buildListTrackDetailsDB() {
     // Creates new table
     db.query(
         "CREATE TABLE listTrackDetails (\n" +
-        "listID int NOT NULL,\n" +
+        "listName VARCHAR(255) NOT NULL,\n" +
         "trackID int NOT NULL,\n" +
-        "PRIMARY KEY (listID,trackID)\n);\n", (err) => {
+        "PRIMARY KEY (listName,trackID)\n);\n", (err) => {
             if (err) {
                 throw err;
             }
