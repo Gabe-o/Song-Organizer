@@ -69,7 +69,7 @@ form {
 }
 
 .albumID {
-    width: 2%;
+    width: 4%;
 }
 
 .albumName {
@@ -78,7 +78,7 @@ form {
 }
 
 .artistID {
-    width: 2%;
+    width: 4%;
 }
 
 .artistName {
@@ -87,7 +87,7 @@ form {
 }
 
 .trackTags {
-    width: 10%;
+    width: 8%;
     text-align: left;
 }
 
@@ -100,11 +100,11 @@ form {
 }
 
 .trackDuration {
-    width: 5%;
+    width: 4%;
 }
 
 .trackGenres {
-    width: 10%;
+    width: 9%;
     text-align: left;
 }
 
@@ -117,7 +117,7 @@ form {
 }
 
 .artistLocation {
-    width: 20%;
+    width: 18%;
     text-align: left;
 }
 

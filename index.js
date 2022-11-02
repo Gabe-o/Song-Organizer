@@ -10,18 +10,7 @@ const db = mysql.createConnection({
     multipleStatements: true,
 });
 
-// Function for sending response after db query
-const queryRes = (err, data) => {
-    if (data.length === 0) {
-        res.status(404).send("Not Found");
-    }
-    else if (err) {
-        res.status(500).send(err);
-    }
-    else {
-        res.send(data);
-    }
-}
+
 
 // Express
 const app = express();
@@ -46,13 +35,33 @@ app.use('/api/artists', artistRouter);
 artistRouter.get('', (req, res) => {
     const artistName = req.query.artistName;
 
-    db.query('SELECT * FROM artists WHERE artistName LIKE' + "'%" + artistName + "%';", queryRes);
+    db.query('SELECT * FROM artists WHERE artistName LIKE' + "'%" + artistName + "%';", (err, data) => {
+        if (data.length === 0) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data);
+        }
+    });
 })
 
 // Querys db for a given artist id and returns 1 result
 artistRouter.get('/:id', (req, res) => {
     const id = req.params.id;
-    db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', queryRes);
+    db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
+        if (data.length === 0) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data);
+        }
+    });
 });
 
 
@@ -66,6 +75,19 @@ trackRouter.get('', (req, res) => {
     const trackTitle = req.query.trackTitle;
     const albumName = req.query.albumName;
     const results = req.query.results;
+
+    // Functions for sending response after db query
+    const queryRes = (err, data) => {
+        if (data.length === 0) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data);
+        }
+    }
 
     // Track title and album name was recived
     if (trackTitle !== "" && albumName !== "") {
@@ -125,7 +147,17 @@ trackRouter.get('/:id', (req, res) => {
         'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
         'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
         'WHERE tracks.trackID=' + id +
-        " LIMIT 1;", queryRes);
+        " LIMIT 1;", (err, data) => {
+            if (data.length === 0) {
+                res.status(404).send("Not Found");
+            }
+            else if (err) {
+                res.status(500).send(err);
+            }
+            else {
+                res.send(data);
+            }
+        });
 });
 
 
