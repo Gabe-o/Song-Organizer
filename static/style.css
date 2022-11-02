@@ -91,7 +91,7 @@ form select {
 }
 
 .trackTags {
-    width: 8%;
+    width: 10%;
     text-align: left;
 }
 
@@ -108,16 +108,12 @@ form select {
 }
 
 .trackGenres {
-    width: 9%;
+    width: 10%;
     text-align: left;
 }
 
 .trackNum {
     width: 2%;
-}
-
-.addToList {
-    width: 3%;
 }
 
 .artistLocation {

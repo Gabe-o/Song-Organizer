@@ -149,12 +149,6 @@ function createTrackTableRow(trackData) {
     td.appendChild(document.createTextNode(trackData.trackNumber));
     tr.appendChild(td);
 
-    // Adds add to list button (NOT IMPLEMENTED)
-    td = document.createElement("td");
-    td.className = "addToList";
-    td.appendChild(document.createTextNode(""));
-    tr.appendChild(td);
-
     return tr;
 }
 
