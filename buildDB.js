@@ -251,6 +251,8 @@ function buildListsDB() {
         "CREATE TABLE lists (\n" +
         "listID int NOT NULL AUTO_INCREMENT,\n" +
         "listName VARCHAR(255) NOT NULL,\n" +
+        "numTracks int DEFAULT NULL,\n" +
+        "totalDuration int DEFAULT NULL,\n" +
         "PRIMARY KEY (listID),\n" +
         "UNIQUE KEY listName_UNIQUE (listName));\n", (err) => {
             if (err) {
