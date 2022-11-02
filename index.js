@@ -27,6 +27,23 @@ app.use((req, res, next) => { // for all routes
 
 
 
+// Gets List of all genre names, IDs and parent IDs
+app.get('/api/genres', (req, res) => {
+    db.query('SELECT genreTitle,genreID,genreParent FROM genres;', (err, data) => {
+        if (data.length === 0) {
+            res.status(404).send("Not Found");
+        }
+        else if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(data);
+        }
+    });
+});
+
+
+
 // Routes requests for /api/artists
 const artistRouter = express.Router();
 app.use('/api/artists', artistRouter);
@@ -46,7 +63,7 @@ artistRouter.get('', (req, res) => {
             res.send(data);
         }
     });
-})
+});
 
 // Querys db for a given artist id and returns 1 result
 artistRouter.get('/:id', (req, res) => {
