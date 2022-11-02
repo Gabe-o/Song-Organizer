@@ -10,6 +10,8 @@ body {
 
 form {
     margin-top: 1vmax;
+    border-bottom: 2px solid rgb(20, 20, 20);
+    padding-bottom: 15%;
 }
 
 div.infoDisplay {
@@ -60,11 +62,6 @@ td {
     overflow-wrap: anywhere;
 }
 
-form {
-    border-style: solid;
-    border-color: white;
-    padding: 2%;
-}
 
 form select {
     width: 95%;
