@@ -14,7 +14,7 @@ form {
 div.infoDisplay {
     width: 90vmax;
     left: 10vmax;
-    top: 3vmax;
+    top: 4vmax;
     position: absolute;
 }
 
@@ -29,17 +29,17 @@ div.sideBar {
 }
 
 div.topBar {
-    height: 3vmax;
+    height: 4vmax;
     width: 90vmax;
     position: fixed;
     left: 10vmax;
     top: 0px;
-    background-color: black;
+    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(20,20,20,1) 100%);
 }
 
 table {
     width: 100%;
-    height: 100%;
+    height: 3vmax;
 }
 
 table#artistHeaders {
