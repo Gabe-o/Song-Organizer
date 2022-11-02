@@ -181,7 +181,7 @@ trackRouter.get('', (req, res) => {
             'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
             'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
             'WHERE tracks.trackTitle LIKE ? ' +
-            "LIMIT ?;", ["%" + albumName + "%", results], queryRes);
+            "LIMIT ?;", ["%" + trackTitle + "%", results], queryRes);
     }
 });
 
@@ -228,6 +228,7 @@ trackRouter.get('/:id', (req, res) => {
 const listRouter = express.Router();
 app.use('/api/lists', listRouter);
 
+// Create a new list with a given list name. Return an error if name exists.
 listRouter.post('', (req, res) => {
     // Input Validation
     const schema = Joi.object({
@@ -253,6 +254,7 @@ listRouter.post('', (req, res) => {
     });
 });
 
+// Get a list of list names
 listRouter.get('', (req, res) => {
     db.query("SELECT * FROM lists", (err, data) => {
         if (data.length === 0) {
