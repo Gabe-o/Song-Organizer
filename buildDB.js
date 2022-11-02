@@ -13,7 +13,9 @@ const db = mysql.createConnection({
 buildGenresDB();
 buildAlbumsDB();
 buildArtistsDB();
-buildTracksDB();
+//buildTracksDB();
+buildListsDB();
+buildListTrackDetailsDB();
 
 // Builds Genres table from CSV file
 function buildGenresDB() {
@@ -34,7 +36,7 @@ function buildGenresDB() {
         "genreID int NOT NULL,\n" +
         "genreNumTracks int DEFAULT NULL,\n" +
         "genreParent int DEFAULT NULL,\n" +
-        "genreTitle char(45) DEFAULT NULL,\n" +
+        "genreTitle varchar(45) DEFAULT NULL,\n" +
         "genreTopLevel int DEFAULT NULL,\n" +
         "PRIMARY KEY (genreID)\n);\n", (err) => {
             if (err) {
@@ -56,7 +58,7 @@ function buildGenresDB() {
                     genre.genre_id + ", " +
                     genre["#tracks"] + ", " +
                     genre.parent + ", " +
-                    '"' + genre.title.replaceAll('"',"") + '"' + ", " +
+                    '"' + genre.title.replaceAll('"', "") + '"' + ", " +
                     genre.top_level + ");", (err) => {
                         if (err) {
                             throw err;
@@ -84,7 +86,7 @@ function buildAlbumsDB() {
     db.query(
         "CREATE TABLE albums (\n" +
         "albumID int NOT NULL,\n" +
-        "albumName char(100) DEFAULT NULL,\n" +
+        "albumName varchar(100) DEFAULT NULL,\n" +
         "PRIMARY KEY (albumID)\n);\n", (err) => {
             if (err) {
                 throw err;
@@ -130,11 +132,11 @@ function buildArtistsDB() {
     db.query(
         "CREATE TABLE artists (\n" +
         "artistID int NOT NULL,\n" +
-        "artistName char(100) DEFAULT NULL,\n" +
-        "artistLocation char(100) DEFAULT NULL,\n" +
+        "artistName varchar(100) DEFAULT NULL,\n" +
+        "artistLocation varchar(100) DEFAULT NULL,\n" +
         "artistFavorites int DEFAULT NULL,\n" +
-        "artistDateCreated char(45) DEFAULT NULL,\n" +
-        "artistWebsite char(200) DEFAULT NULL,\n" +
+        "artistDateCreated varchar(45) DEFAULT NULL,\n" +
+        "artistWebsite varchar(200) DEFAULT NULL,\n" +
         "artistAssociatedLabels text DEFAULT NULL,\n" +
         "PRIMARY KEY (artistID)\n);\n", (err) => {
             if (err) {
@@ -155,11 +157,11 @@ function buildArtistsDB() {
                 db.query("INSERT INTO artists VALUES (" +
                     artist.artist_id + ", " +
                     '"' + artist.artist_handle.replace(/[_"]/g, ' ').trim() + '"' + ", " +
-                    '"' + artist.artist_location.replaceAll('"',"").split('\n')[0].slice(0, 99) + '"' + ", " +
+                    '"' + artist.artist_location.replaceAll('"', "").split('\n')[0].slice(0, 99) + '"' + ", " +
                     artist.artist_favorites + ", " +
-                    '"' + artist.artist_date_created.replaceAll('"',"") + '"' + ", " +
-                    '"' + artist.artist_website.replaceAll('"',"") + '"' + ", " +
-                    '"' + artist.artist_associated_labels.replaceAll('"',"") + '"' + ");", (err) => {
+                    '"' + artist.artist_date_created.replaceAll('"', "") + '"' + ", " +
+                    '"' + artist.artist_website.replaceAll('"', "") + '"' + ", " +
+                    '"' + artist.artist_associated_labels.replaceAll('"', "") + '"' + ");", (err) => {
                         if (err) {
                             throw err;
                         }
@@ -189,12 +191,12 @@ function buildTracksDB() {
         "albumID int DEFAULT NULL,\n" +
         "artistID int DEFAULT NULL,\n" +
         "trackTags text DEFAULT NULL,\n" +
-        "trackDateCreated char(45) DEFAULT NULL,\n" +
-        "trackDateRecorded char(45) DEFAULT NULL,\n" +
-        "trackDuration char(45) DEFAULT NULL,\n" +
+        "trackDateCreated varchar(45) DEFAULT NULL,\n" +
+        "trackDateRecorded varchar(45) DEFAULT NULL,\n" +
+        "trackDuration varchar(45) DEFAULT NULL,\n" +
         "trackGenres text DEFAULT NULL,\n" +
         "trackNumber int DEFAULT NULL,\n" +
-        "trackTitle char(200) DEFAULT NULL,\n" +
+        "trackTitle varchar(200) DEFAULT NULL,\n" +
         "PRIMARY KEY (trackID)\n);\n", (err) => {
             if (err) {
                 throw err;
@@ -215,11 +217,11 @@ function buildTracksDB() {
                     track.track_id + ", " +
                     ((track.album_id === '') ? "null" : track.album_id) + ", " +
                     track.artist_id + ", " +
-                    '"' + track.tags.replaceAll('"',"") + '"' + ", " +
-                    '"' + track.track_date_created.replaceAll('"',"") + '"' + ", " +
-                    '"' + track.track_date_recorded.replaceAll('"',"") + '"' + ", " +
-                    '"' + track.track_duration.replaceAll('"',"") + '"' + ", " +
-                    '"' + track.track_genres.replaceAll('"',"") + '"' + ", " +
+                    '"' + track.tags.replaceAll('"', "") + '"' + ", " +
+                    '"' + track.track_date_created.replaceAll('"', "") + '"' + ", " +
+                    '"' + track.track_date_recorded.replaceAll('"', "") + '"' + ", " +
+                    '"' + track.track_duration.replaceAll('"', "") + '"' + ", " +
+                    '"' + track.track_genres.replaceAll('"', "") + '"' + ", " +
                     track.track_number + ", " +
                     '"' + track.track_title.replace(/[;\\"]/g, "").trim() + '"' + ");", (err) => {
                         if (err) {
@@ -229,4 +231,58 @@ function buildTracksDB() {
                     });
             }
         });
+}
+
+// Builds Lists table
+function buildListsDB() {
+    // Deletes the table if one already exists
+    db.query("DROP TABLE lists;", (err) => {
+        if (err) {
+            console.log("No Table to drop");
+        }
+        else {
+            console.log("Dropped Table");
+        }
+    }
+    );
+
+    // Creates new table
+    db.query(
+        "CREATE TABLE lists (\n" +
+        "listID int NOT NULL,\n" +
+        "listName VARCHAR(255) DEFAULT NULL,\n" +
+        "PRIMARY KEY (listID)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Lists Table Created");
+        }
+    );
+}
+
+// Build List Track DB table
+function buildListTrackDetailsDB() {
+    // Deletes the table if one already exists
+    db.query("DROP TABLE listTrackDetails;", (err) => {
+        if (err) {
+            console.log("No Table to drop");
+        }
+        else {
+            console.log("Dropped Table");
+        }
+    }
+    );
+
+    // Creates new table
+    db.query(
+        "CREATE TABLE listTrackDetails (\n" +
+        "listID int NOT NULL,\n" +
+        "trackID int NOT NULL,\n" +
+        "PRIMARY KEY (listID,trackID)\n);\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("List Track Detail Table Created");
+        }
+    );
 }
