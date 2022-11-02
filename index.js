@@ -31,13 +31,13 @@ app.use((req, res, next) => { // for all routes
 app.get('/api/genres', (req, res) => {
     db.query('SELECT genreTitle,genreID,genreParent FROM genres;', (err, data) => {
         if (data.length === 0) {
-            res.status(404).send("Not Found");
+            res.status(404).json("Genre Not Found");
         }
         else if (err) {
-            res.status(500).send(err);
+            res.status(500).json(err);
         }
         else {
-            res.send(data);
+            res.json(data);
         }
     });
 });
@@ -54,13 +54,13 @@ artistRouter.get('', (req, res) => {
 
     db.query('SELECT * FROM artists WHERE artistName LIKE' + "'%" + artistName + "%';", (err, data) => {
         if (data.length === 0) {
-            res.status(404).send("Not Found");
+            res.status(404).json("Artist Not Found");
         }
         else if (err) {
-            res.status(500).send(err);
+            res.status(500).json(err);
         }
         else {
-            res.send(data);
+            res.json(data);
         }
     });
 });
@@ -70,13 +70,13 @@ artistRouter.get('/:id', (req, res) => {
     const id = req.params.id;
     db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
         if (data.length === 0) {
-            res.status(404).send("Not Found");
+            res.status(404).json("Not Found");
         }
         else if (err) {
-            res.status(500).send(err);
+            res.status(500).json(err);
         }
         else {
-            res.send(data);
+            res.json(data);
         }
     });
 });
@@ -96,13 +96,13 @@ trackRouter.get('', (req, res) => {
     // Functions for sending response after db query
     const queryRes = (err, data) => {
         if (data.length === 0) {
-            res.status(404).send("Not Found");
+            res.status(404).json("Track Not Found");
         }
         else if (err) {
-            res.status(500).send(err);
+            res.status(500).json(err);
         }
         else {
-            res.send(data);
+            res.json(data);
         }
     }
 
@@ -166,13 +166,13 @@ trackRouter.get('/:id', (req, res) => {
         'WHERE tracks.trackID=' + id +
         " LIMIT 1;", (err, data) => {
             if (data.length === 0) {
-                res.status(404).send("Not Found");
+                res.status(404).json("Track Not Found");
             }
             else if (err) {
-                res.status(500).send(err);
+                res.status(500).json(err);
             }
             else {
-                res.send(data);
+                res.json(data);
             }
         });
 });
@@ -188,13 +188,13 @@ listRouter.post('', (req, res) => {
 
     db.query("INSERT INTO lists (listName) VALUES ('" + listName + "')", (err, data) => {
         if(err.code === 'ER_DUP_ENTRY') {
-            res.status(422).send(err.sqlMessage);
+            res.status(422).json(err.sqlMessage);
         }
         else if(err) {
             throw err;
         }
         else {
-            res.send(data);
+            res.json(data);
         }
     });
 });

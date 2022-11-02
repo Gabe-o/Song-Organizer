@@ -11,22 +11,28 @@ artistForm.addEventListener("submit", (e) => {
             'Content-Type': 'application/json'
         })
     })
-        .then(httpResp => httpResp.json())
-        .then(data => {
-            // Toggles headers
-            document.getElementById("artistHeaders").style.display = "table";
-            document.getElementById("trackHeaders").style.display = "none";
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                // Clears current data
+                let table = document.getElementById("infoTable");
+                table.textContent = "";
+                if (httpResp.ok) {
+                    // Toggles headers
+                    document.getElementById("artistHeaders").style.display = "table";
+                    document.getElementById("trackHeaders").style.display = "none";
 
-            // Appends Data
-            let table = document.getElementById("infoTable");
-            table.textContent = "";
-
-            for (let artist of data) {
-                table.appendChild(createArtistTableRow(artist));
-            }
+                    // Appends Data
+                    for (let artist of data) {
+                        table.appendChild(createArtistTableRow(artist));
+                    }
+                }
+                else {
+                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                }
+            })
         })
         .catch(err => {
-            throw err;
+            alert(err);
         })
 });
 
@@ -46,22 +52,29 @@ trackForm.addEventListener("keypress", (e) => {
                 'Content-Type': 'application/json'
             })
         })
-            .then(httpResp => httpResp.json())
-            .then(data => {
-                // Toggles Headers
-                document.getElementById("artistHeaders").style.display = "none";
-                document.getElementById("trackHeaders").style.display = "table";
+            .then(httpResp => {
+                return httpResp.json().then(data => {
+                    // Clears current data
+                    let table = document.getElementById("infoTable");
+                    table.textContent = "";
 
-                // Appends Data
-                let table = document.getElementById("infoTable");
-                table.textContent = "";
+                    if (httpResp.ok) {
+                        // Toggles Headers
+                        document.getElementById("artistHeaders").style.display = "none";
+                        document.getElementById("trackHeaders").style.display = "table";
 
-                for (let track of data) {
-                    table.appendChild(createTrackTableRow(track));
-                }
+                        // Appends Data
+                        for (let track of data) {
+                            table.appendChild(createTrackTableRow(track));
+                        }
+                    }
+                    else {
+                        throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                    }
+                })
             })
             .catch(err => {
-                throw err;
+                alert(err);
             })
     }
 });
