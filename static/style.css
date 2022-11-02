@@ -42,6 +42,12 @@ table {
     height: 100%;
 }
 
+table#artistHeaders {
+    position: absolute;
+    top: 0px;
+    display: none;
+}
+
 td {
     text-align: center;
 }
@@ -101,4 +107,29 @@ td {
 
 .addToList {
     width: 3%;
+}
+
+.artistLocation {
+    width: 20%;
+    text-align: left;
+}
+
+.artistFavorites {
+    width: 4%;
+    text-align: left;
+}
+
+.artistDateCreated {
+    width: 7%;
+    text-align: left;
+}
+
+.artistWebsite {
+    width: 27%;
+    text-align: left;
+}
+
+.artistAssociatedLabels {
+    width: 27%;
+    text-align: left;
 }

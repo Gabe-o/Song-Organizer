@@ -13,6 +13,9 @@ artistForm.addEventListener("submit", (e) => {
     })
         .then(httpResp => httpResp.json())
         .then(data => {
+            document.getElementById("artistHeaders").style.display = "table";
+            document.getElementById("trackHeaders").style.display = "none";
+
             console.log(data);
         })
         .catch(err => {
@@ -39,6 +42,9 @@ trackForm.addEventListener("keypress", (e) => {
         })
             .then(httpResp => httpResp.json())
             .then(data => {
+                document.getElementById("artistHeaders").style.display = "none";
+                document.getElementById("trackHeaders").style.display = "table";
+
                 // Appends Data
                 let table = document.getElementById("infoTable");
                 table.textContent = "";
