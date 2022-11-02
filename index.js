@@ -19,6 +19,8 @@ const port = 3000;
 // For serving static front end
 app.use('/', express.static('static'));
 
+app.use(express.json());
+
 // For logging requests
 app.use((req, res, next) => { // for all routes
     console.log('Request: ', req.method, ' \tPath: ', req.url);
@@ -42,7 +44,7 @@ artistRouter.get('', (req, res) => {
     const artistName = req.query.artistName;
 
     db.query('SELECT * FROM artists WHERE artistName LIKE' + "'%" + artistName + "%';", (err, data) => {
-        if (data === []) {
+        if (data.length === 0) {
             res.status(404).send("Not Found");
         }
         else if (err) {
@@ -58,7 +60,7 @@ artistRouter.get('', (req, res) => {
 artistRouter.get('/:id', (req, res) => {
     const id = req.params.id;
     db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
-        if (data === []) {
+        if (data.length === 0) {
             res.status(404).send("Not Found");
         }
         else if (err) {
@@ -82,7 +84,7 @@ trackRouter.get('', (req, res) => {
 
     // Functions for sending response after db query
     const queryRes = (err, data) => {
-        if (data === []) {
+        if (data.length === 0) {
             res.status(404).send("Not Found");
         }
         else if (err) {
@@ -152,7 +154,7 @@ trackRouter.get('/:id', (req, res) => {
         'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
         'WHERE tracks.trackID=' + id +
         " LIMIT 1;", (err, data) => {
-            if (data === []) {
+            if (data.length === 0) {
                 res.status(404).send("Not Found");
             }
             else if (err) {
