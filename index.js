@@ -1,5 +1,6 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
+const Joi = require('Joi');
 
 // Connecting to db
 const db = mysql.createConnection({
@@ -7,7 +8,6 @@ const db = mysql.createConnection({
     user: 'root',
     password: 'root',
     database: 'lab3db',
-    multipleStatements: true,
 });
 
 
@@ -50,14 +50,24 @@ app.use('/api/artists', artistRouter);
 
 // Query db for given artist name
 artistRouter.get('', (req, res) => {
-    const artistName = req.query.artistName;
+    // Input validation
+    const schema = Joi.object({
+        artistName: Joi.string().required()
+    });
+    const result = schema.validate(req.query);
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
 
-    db.query('SELECT * FROM artists WHERE artistName LIKE' + "'%" + artistName + "%';", (err, data) => {
-        if (data.length === 0) {
-            res.status(404).json("Artist Not Found");
-        }
-        else if (err) {
+    // Query using prepared statement to prevent injection attacks
+    const artistName = "%" + req.query.artistName + "%";
+    db.query("SELECT * FROM artists WHERE artistName LIKE ?;", [artistName], (err, data) => {
+        if (err) {
             res.status(500).json(err);
+        }
+        else if (data.length === 0) {
+            res.status(404).json("Artist Not Found");
         }
         else {
             res.json(data);
@@ -67,13 +77,24 @@ artistRouter.get('', (req, res) => {
 
 // Querys db for a given artist id and returns 1 result
 artistRouter.get('/:id', (req, res) => {
+    // Input validation
+    const schema = Joi.object({
+        id: Joi.number().required()
+    });
+    const result = schema.validate({ id: parseInt(req.params.id) });
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
+
+    // Query using prepared statement to prevent injection attacks
     const id = req.params.id;
-    db.query('SELECT * FROM artists WHERE artistID=' + id + ' LIMIT 1;', (err, data) => {
-        if (data.length === 0) {
-            res.status(404).json("Not Found");
-        }
-        else if (err) {
+    db.query('SELECT * FROM artists WHERE artistID= ? LIMIT 1;', [id], (err, data) => {
+        if (err) {
             res.status(500).json(err);
+        }
+        else if (data.length === 0) {
+            res.status(404).json("Artist Not Found");
         }
         else {
             res.json(data);
@@ -89,17 +110,30 @@ app.use('/api/tracks', trackRouter);
 
 // Querys db for given trackTitle and/or albumName and returns specified number of results
 trackRouter.get('', (req, res) => {
+    // Input validation
+    const schema = Joi.object({
+        trackTitle: Joi.string().allow(""),
+        albumName: Joi.when("trackTitle", { is: "", then: Joi.string(), otherwise: Joi.string().allow("") }),
+        results: Joi.number().required()
+    })
+        .or("trackTitle", "albumName");
+    const result = schema.validate(req.query);
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
+
     const trackTitle = req.query.trackTitle;
     const albumName = req.query.albumName;
-    const results = req.query.results;
+    const results = parseInt(req.query.results);
 
     // Functions for sending response after db query
     const queryRes = (err, data) => {
-        if (data.length === 0) {
-            res.status(404).json("Track Not Found");
-        }
-        else if (err) {
+        if (err) {
             res.status(500).json(err);
+        }
+        else if (data.length === 0) {
+            res.status(404).json("Track Not Found");
         }
         else {
             res.json(data);
@@ -117,9 +151,9 @@ trackRouter.get('', (req, res) => {
             'FROM tracks ' +
             'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
             'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
-            'WHERE tracks.trackTitle LIKE ' + "'%" + trackTitle + "%'" +
-            'AND albums.albumName LIKE ' + "'%" + albumName + "%' " +
-            "LIMIT " + results + ";", queryRes);
+            'WHERE tracks.trackTitle LIKE ? ' +
+            'AND albums.albumName LIKE ? ' +
+            "LIMIT ?;", ["%" + trackTitle + "%", "%" + albumName + "%", results], queryRes);
     }
     // Album name was recived
     else if (trackTitle === "" && albumName !== "") {
@@ -132,8 +166,8 @@ trackRouter.get('', (req, res) => {
             'FROM tracks ' +
             'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
             'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
-            'WHERE albums.albumName LIKE ' + "'%" + albumName + "%' " +
-            "LIMIT " + results + ";", queryRes);
+            'WHERE albums.albumName LIKE ? ' +
+            "LIMIT ?;", ["%" + albumName + "%", results], queryRes);
     }
     // Track title was recived
     else if (trackTitle !== "" && albumName === "") {
@@ -146,14 +180,25 @@ trackRouter.get('', (req, res) => {
             'FROM tracks ' +
             'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
             'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
-            'WHERE tracks.trackTitle LIKE ' + "'%" + trackTitle + "%' " +
-            "LIMIT " + results + ";", queryRes);
+            'WHERE tracks.trackTitle LIKE ? ' +
+            "LIMIT ?;", ["%" + albumName + "%", results], queryRes);
     }
 });
 
 // Querys db for given track id and returns 1 result
 trackRouter.get('/:id', (req, res) => {
+    // Input validation
+    const schema = Joi.object({
+        id: Joi.number().required()
+    });
+    const result = schema.validate({ id: parseInt(req.params.id) });
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
+
     const id = req.params.id;
+
     db.query('SELECT tracks.trackID,tracks.albumID,' +
         'albums.albumName,tracks.artistID,' +
         'artists.artistName,tracks.trackTags,' +
@@ -163,8 +208,8 @@ trackRouter.get('/:id', (req, res) => {
         'FROM tracks ' +
         'LEFT JOIN albums ON tracks.albumID=albums.albumID ' +
         'LEFT JOIN artists ON tracks.artistID=artists.artistID ' +
-        'WHERE tracks.trackID=' + id +
-        " LIMIT 1;", (err, data) => {
+        'WHERE tracks.trackID=?' +
+        " LIMIT 1;", [id], (err, data) => {
             if (data.length === 0) {
                 res.status(404).json("Track Not Found");
             }
@@ -184,19 +229,42 @@ const listRouter = express.Router();
 app.use('/api/lists', listRouter);
 
 listRouter.post('', (req, res) => {
+    // Input Validation
+    const schema = Joi.object({
+        listName: Joi.string().required()
+    });
+    const result = schema.validate(req.body);
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
+
     const listName = req.body.listName;
 
-    db.query("INSERT INTO lists (listName) VALUES ('" + listName + "')", (err, data) => {
-        if(err.code === 'ER_DUP_ENTRY') {
-            res.status(422).json(err.sqlMessage);
-        }
-        else if(err) {
-            throw err;
+    db.query("INSERT INTO lists (listName) VALUES (?)", [listName], (err, data) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(422).json(err.sqlMessage);
+            }
         }
         else {
             res.json(data);
         }
     });
+});
+
+listRouter.get('', (req, res) => {
+    db.query("SELECT * FROM lists", (err, data) => {
+        if (data.length === 0) {
+            res.status(404).json(data);
+        }
+        else if (err) {
+            throw err;
+        }
+        else {
+            res.json(data);
+        }
+    })
 });
 
 
