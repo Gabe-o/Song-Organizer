@@ -179,6 +179,22 @@ trackRouter.get('/:id', (req, res) => {
 
 
 
+// Routes requests for /api/lists
+const listRouter = express.Router();
+app.use('/api/lists', listRouter);
+
+listRouter.post('', (req, res) => {
+    const listName = req.body.listName;
+
+    db.query("INSERT INTO lists (listName) VALUES ('" + listName + "')", (err, data) => {
+        if(err) {
+            throw err;
+        }
+        res.send(data);
+    });
+});
+
+
 // Listening for requests on given port
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)

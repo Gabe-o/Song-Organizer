@@ -10,10 +10,10 @@ const db = mysql.createConnection({
     multipleStatements: true
 });
 
-buildGenresDB();
-buildAlbumsDB();
-buildArtistsDB();
-buildTracksDB();
+// buildGenresDB();
+// buildAlbumsDB();
+// buildArtistsDB();
+// buildTracksDB();
 buildListsDB();
 buildListTrackDetailsDB();
 
@@ -247,9 +247,9 @@ function buildListsDB() {
     );
 
     // Creates new table
-    db.query(
+    db.query( 
         "CREATE TABLE lists (\n" +
-        "listID int NOT NULL,\n" +
+        "listID int NOT NULL AUTO_INCREMENT,\n" +
         "listName VARCHAR(255) DEFAULT NULL,\n" +
         "PRIMARY KEY (listID)\n);\n", (err) => {
             if (err) {

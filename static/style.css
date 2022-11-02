@@ -39,13 +39,19 @@ div.topBar {
 
 table {
     width: 100%;
-    height: 3vmax;
 }
 
 table#artistHeaders {
     position: absolute;
     top: 0px;
     display: none;
+    height: 3vmax;
+}
+
+table#trackHeaders {
+    position: absolute;
+    top: 0px;
+    height: 3vmax;
 }
 
 td {
