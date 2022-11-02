@@ -59,6 +59,10 @@ form {
     padding: 2%;
 }
 
+form select {
+    width: 95%;
+}
+
 .trackID {
     width: 4%;
 }

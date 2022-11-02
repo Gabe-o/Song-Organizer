@@ -1,60 +1,87 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>se3316 golivott lab3</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="sideBar">
-            <form id="artistSearch">
-                <h2>Artists</h2>
-                <label for="artistInput">Search Artists:</label><br>
-                <input type="text" id="artistInput" name="artistName"><br>
-            </form>
-            <form id="trackSearch">
-                <h2>Tracks</h2>
-                <label for="trackInput">Search Tracks:</label><br>
-                <input type="text" id="trackInput" name="trackTitle"><br>
-                <label for="albumInput">Search Albums:</label><br>
-                <input type="text" id="albumInput" name="albumName"><br>
-            </form>
-        </div>
-        <div class="infoDisplay">
-            <table id = "infoTable">
-            </table>
-        </div>
-        <div class="topBar">
-            <table id="trackHeaders">
-                <tr>
-                    <th class="trackID">#</th>
-                    <th class="trackTitle">Track</th>
-                    <th class="albumID">#</th>
-                    <th class="albumName">Album</th>
-                    <th class="artistID">#</th>
-                    <th class="artistName">Artist</th>
-                    <th class="trackTags">Tags</th>
-                    <th class="trackDateCreated">Created</th>
-                    <th class="trackDateRecorded">Recorded</th>
-                    <th class="trackDuration">Duration</th>
-                    <th class="trackGenres">Genres</th>
-                    <th class="trackNum">tNum</th>
-                    <th class="addToList">+</th>
-                </tr>
-            </table>
-            <table id="artistHeaders">
-                <tr>
-                    <th class="artistID">#</th>
-                    <th class="artistName">Artist</th>
-                    <th class="artistLocation">Location</th>
-                    <th class="artistFavorites">Likes</th>
-                    <th class="artistDateCreated">Date Created</th>
-                    <th class="artistWebsite">Website</th>
-                    <th class="artistAssociatedLabels">Labels</th>
-                </tr>
-            </table>
-        </div>
 
-        <script src="frontend.js"></script>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <title>se3316 golivott lab3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="sideBar">
+        <form id="artistSearch">
+            <h2>Artists</h2>
+            <label for="artistInput">Search by Artists:</label><br>
+            <input type="text" id="artistInput" name="artistName"><br>
+        </form>
+        <form id="trackSearch">
+            <h2>Tracks</h2>
+            <label for="trackInput">Search by Tracks:</label><br>
+            <input type="text" id="trackInput" name="trackTitle"><br>
+            <label for="albumInput">Search by Albums:</label><br>
+            <input type="text" id="albumInput" name="albumName"><br>
+        </form>
+        <form id="createList">
+            <h2>Create List</h2>
+            <label for="listNameInput">Enter List:</label><br>
+            <input type="text" id="listNameInput" name="listNameTitle"><br>
+        </form>
+        <form id="viewList">
+            <h2>View List</h2>
+            <label for="viewListSelect">Select List:</label><br>
+            <select id="viewListSelect" name="viewListSelect">
+
+            </select><br>
+            <p>Tracks:</p>
+            <p>Duration:</p>
+            <button type="button">Delete</button> 
+        </form>
+        <form id="addTrack">
+            <h2>Add Track</h2>
+            <label for="listSelect">Select List:</label><br>
+            <select id="listSelect" name="listSelect">
+
+            </select><br>
+            <label for="addTrackInput">Enter Track ID:</label><br>
+            <input type="text" id="addTrackInput" name="addTrackInput"><br>
+        </form>
+    </div>
+    <div class="infoDisplay">
+        <table id="infoTable">
+        </table>
+    </div>
+    <div class="topBar">
+        <table id="trackHeaders">
+            <tr>
+                <th class="trackID">#</th>
+                <th class="trackTitle">Track</th>
+                <th class="albumID">#</th>
+                <th class="albumName">Album</th>
+                <th class="artistID">#</th>
+                <th class="artistName">Artist</th>
+                <th class="trackTags">Tags</th>
+                <th class="trackDateCreated">Created</th>
+                <th class="trackDateRecorded">Recorded</th>
+                <th class="trackDuration">Duration</th>
+                <th class="trackGenres">Genres</th>
+                <th class="trackNum">tNum</th>
+                <th class="addToList">+</th>
+            </tr>
+        </table>
+        <table id="artistHeaders">
+            <tr>
+                <th class="artistID">#</th>
+                <th class="artistName">Artist</th>
+                <th class="artistLocation">Location</th>
+                <th class="artistFavorites">Likes</th>
+                <th class="artistDateCreated">Date Created</th>
+                <th class="artistWebsite">Website</th>
+                <th class="artistAssociatedLabels">Labels</th>
+            </tr>
+        </table>
+    </div>
+
+    <script src="frontend.js"></script>
+</body>
+
 </html>
