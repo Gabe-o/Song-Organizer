@@ -13,7 +13,7 @@ const db = mysql.createConnection({
 buildGenresDB();
 buildAlbumsDB();
 buildArtistsDB();
-//buildTracksDB();
+buildTracksDB();
 buildListsDB();
 buildListTrackDetailsDB();
 
@@ -282,7 +282,7 @@ function buildListTrackDetailsDB() {
             if (err) {
                 throw err;
             }
-            console.log("List Track Detail Table Created");
+            console.log("List Track Details Table Created");
         }
     );
 }
