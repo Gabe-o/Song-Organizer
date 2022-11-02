@@ -1,5 +1,5 @@
+// Adds event listener for searching for an artist
 const artistForm = document.getElementById("artistSearch");
-
 artistForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -30,9 +30,8 @@ artistForm.addEventListener("submit", (e) => {
         })
 });
 
-const trackForm = document.getElementById("trackSearch");
-
 // Adds event listener for searching for a track
+const trackForm = document.getElementById("trackSearch");
 trackForm.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         // Gets input info
@@ -159,6 +158,7 @@ function createTrackTableRow(trackData) {
     return tr;
 }
 
+// returns a table row element for given artist data
 function createArtistTableRow(artistData) {
     let tr = document.createElement("tr");
 

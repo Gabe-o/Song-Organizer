@@ -53,6 +53,12 @@ td {
     overflow-wrap: anywhere;
 }
 
+form {
+    border-style: solid;
+    border-color: white;
+    padding: 2%;
+}
+
 .trackID {
     width: 4%;
 }
