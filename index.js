@@ -330,7 +330,7 @@ listRouter.put('/:listName', (req, res) => {
     let tracks = req.query.tracks.split(",").map(id => parseInt(id)).filter(Boolean);
 
     // Checks if a list exists
-    db.query("SELECT listName FROM lists WHERE listName=?;", [listName], (err, data) => {
+    db.query("SELECT listName FROM lists WHERE listName=? LIMIT 1;", [listName], (err, data) => {
         if (err) {
             res.status(500).json(err);
             return;
@@ -425,6 +425,7 @@ listRouter.delete('/:listName', (req, res) => {
 
     const listName = req.params.listName;
 
+    // Checks if list exists
     db.query("SELECT listName FROM lists WHERE listName=? LIMIT 1", [listName], (err, data) => {
         if (err) {
             res.status(500).json(err);
@@ -436,12 +437,14 @@ listRouter.delete('/:listName', (req, res) => {
             return;
         }
 
+        // Deletes from list db
         db.query("DELETE FROM lists WHERE listName=?", [listName], (err, data) => {
             if (err) {
                 res.status(500).json(err);
                 return;
             }
 
+            // Deletes from list track details db
             db.query("DELETE FROM listtrackdetails WHERE listName=?", [listName], (err) => {
                 if (err) {
                     res.status(500).json(err);
