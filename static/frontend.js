@@ -112,6 +112,14 @@ createListForm.addEventListener("submit", (e) => {
         })
 });
 
+// Adds event listener for updating list info on select
+const viewListSelect = document.getElementById("viewListSelect");
+const addTrackSelect = document.getElementById("listSelect");
+viewListSelect.addEventListener("change", (e) => {
+    document.getElementById("numTracks").textContent = "Tracks: " + lists.find(list => list.listName === viewListSelect.value).numTracks;
+    document.getElementById("totDuration").textContent = "Duration: " + lists.find(list => list.listName === viewListSelect.value).totalDuration;
+});
+
 // Populates list select boxes with data from the db
 function populateLists() {
     fetch("http://localhost:3000/api/lists", {
@@ -124,15 +132,15 @@ function populateLists() {
             return httpResp.json().then(data => {
                 if (httpResp.ok) {
                     lists = data;
-                    document.getElementById("viewListSelect").textContent = "";
-                    document.getElementById("listSelect").textContent = "";
+                    viewListSelect.textContent = "";
+                    addTrackSelect.textContent = "";
 
-                    document.getElementById("viewListSelect").appendChild(document.createElement("option"));
-                    document.getElementById("listSelect").appendChild(document.createElement("option"));
+                    viewListSelect.appendChild(document.createElement("option"));
+                    addTrackSelect.appendChild(document.createElement("option"));
 
                     for (let list of lists) {
-                        document.getElementById("viewListSelect").appendChild(createSelectOption(list));
-                        document.getElementById("listSelect").appendChild(createSelectOption(list));
+                        viewListSelect.appendChild(createSelectOption(list));
+                        addTrackSelect.appendChild(createSelectOption(list));
                     }
                 }
                 else {
