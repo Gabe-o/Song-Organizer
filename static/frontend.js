@@ -228,6 +228,7 @@ addTrackform.addEventListener("submit", (e) => {
     })
         .then(httpResp => {
             return httpResp.json().then(data => {
+                addTrackInput.value = null;
                 populateLists();
             })
         })
@@ -251,6 +252,9 @@ function populateLists() {
 
                 viewListSelect.appendChild(document.createElement("option"));
                 addTrackSelect.appendChild(document.createElement("option"));
+
+                document.getElementById("numTracks").textContent = "Tracks: ";
+                document.getElementById("totDuration").textContent = "Duration: ";
 
                 if (httpResp.ok) {
                     lists = data;
