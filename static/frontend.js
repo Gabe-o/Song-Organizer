@@ -212,8 +212,29 @@ deleteListBtn.addEventListener("click", (e) => {
     }
 });
 
-
+// Adds event listener for adding tracks to a list
 const addTrackSelect = document.getElementById("listSelect");
+const addTrackInput = document.getElementById("addTrackInput");
+const addTrackform = document.getElementById("addTrack");
+addTrackform.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    // Sends request with query
+    fetch("http://localhost:3000/api/lists/" + addTrackSelect.value + "?tracks=" + addTrackInput.value, {
+        method: "PUT",
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    })
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                populateLists();
+            })
+        })
+        .catch(err => {
+            alert(err);
+        })
+});
 
 // Populates list select boxes with data from the db
 function populateLists() {

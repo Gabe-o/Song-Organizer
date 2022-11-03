@@ -393,7 +393,7 @@ listRouter.put('/:listName', (req, res) => {
                             res.status(500).json(err);
                             return;
                         }
-                        res.json();
+                        res.json("Success");
                     });
                 });
             }
@@ -404,7 +404,7 @@ listRouter.put('/:listName', (req, res) => {
                         res.status(500).json(err);
                         return;
                     }
-                    res.json();
+                    res.json("Success");
                 });
             }
         });
