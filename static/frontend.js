@@ -182,32 +182,36 @@ viewListSelect.addEventListener("change", (e) => {
 // Adds event listener for deleting
 const deleteListBtn = document.getElementById("delBtn");
 deleteListBtn.addEventListener("click", (e) => {
-    
-    // Sends request with query
-    fetch("http://localhost:3000/api/lists/" + viewListSelect.value, {
-        method: "DELETE",
-        headers: new Headers({
-            'Content-Type': 'application/json'
-        })
-    })
-        .then(httpResp => {
-            return httpResp.json().then(data => {
-                // Clears current data
-                let table = document.getElementById("infoTable");
-                table.textContent = "";
 
-                if (httpResp.ok) {
-                    populateLists();
-                }
-                else {
-                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
-                }
+    // If a list is selected
+    if (viewListSelect.value !== "") {
+        // Sends request with query
+        fetch("http://localhost:3000/api/lists/" + viewListSelect.value, {
+            method: "DELETE",
+            headers: new Headers({
+                'Content-Type': 'application/json'
             })
         })
-        .catch(err => {
-            alert(err);
-        })
+            .then(httpResp => {
+                return httpResp.json().then(data => {
+                    // Clears current data
+                    let table = document.getElementById("infoTable");
+                    table.textContent = "";
+
+                    if (httpResp.ok) {
+                        populateLists();
+                    }
+                    else {
+                        throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                    }
+                })
+            })
+            .catch(err => {
+                alert(err);
+            })
+    }
 });
+
 
 const addTrackSelect = document.getElementById("listSelect");
 
@@ -221,18 +225,22 @@ function populateLists() {
     })
         .then(httpResp => {
             return httpResp.json().then(data => {
+                viewListSelect.textContent = "";
+                addTrackSelect.textContent = "";
+
+                viewListSelect.appendChild(document.createElement("option"));
+                addTrackSelect.appendChild(document.createElement("option"));
+
                 if (httpResp.ok) {
                     lists = data;
-                    viewListSelect.textContent = "";
-                    addTrackSelect.textContent = "";
-
-                    viewListSelect.appendChild(document.createElement("option"));
-                    addTrackSelect.appendChild(document.createElement("option"));
 
                     for (let list of lists) {
                         viewListSelect.appendChild(createSelectOption(list));
                         addTrackSelect.appendChild(createSelectOption(list));
                     }
+                }
+                else if (httpResp.status === 404) {
+                    return;
                 }
                 else {
                     throw new Error(httpResp.status + "\n" + JSON.stringify(data));
