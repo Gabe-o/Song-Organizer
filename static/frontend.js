@@ -114,7 +114,7 @@ createListForm.addEventListener("submit", (e) => {
 
 // Adds event listener for updating list info on select
 const viewListSelect = document.getElementById("viewListSelect");
-const addTrackSelect = document.getElementById("listSelect");
+
 viewListSelect.addEventListener("change", (e) => {
     // Clears current data
     let table = document.getElementById("infoTable");
@@ -178,6 +178,38 @@ viewListSelect.addEventListener("change", (e) => {
         document.getElementById("totDuration").textContent = "Duration: ";
     }
 });
+
+// Adds event listener for deleting
+const deleteListBtn = document.getElementById("delBtn");
+deleteListBtn.addEventListener("click", (e) => {
+    
+    // Sends request with query
+    fetch("http://localhost:3000/api/lists/" + viewListSelect.value, {
+        method: "DELETE",
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    })
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                // Clears current data
+                let table = document.getElementById("infoTable");
+                table.textContent = "";
+
+                if (httpResp.ok) {
+                    populateLists();
+                }
+                else {
+                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                }
+            })
+        })
+        .catch(err => {
+            alert(err);
+        })
+});
+
+const addTrackSelect = document.getElementById("listSelect");
 
 // Populates list select boxes with data from the db
 function populateLists() {

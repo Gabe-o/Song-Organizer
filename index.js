@@ -438,7 +438,7 @@ listRouter.delete('/:listName', (req, res) => {
         }
 
         // Deletes from list db
-        db.query("DELETE FROM lists WHERE listName=?", [listName], (err, data) => {
+        db.query("DELETE FROM lists WHERE listName=?", [listName], (err) => {
             if (err) {
                 res.status(500).json(err);
                 return;
@@ -450,7 +450,7 @@ listRouter.delete('/:listName', (req, res) => {
                     res.status(500).json(err);
                     return;
                 }
-                res.json()
+                res.json("Success");
             });
         });
     });
