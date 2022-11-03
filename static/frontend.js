@@ -1,5 +1,41 @@
 var lists = [];
 
+// Show genres
+const genresBtn = document.getElementById("genresBtn");
+genresBtn.addEventListener("click", (e) => {
+    fetch("http://localhost:3000/api/genres", {
+        method: "GET",
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    })
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                // Clears current data
+                let table = document.getElementById("infoTable");
+                table.textContent = "";
+
+                if (httpResp.ok) {
+                    // Toggles headers
+                    document.getElementById("artistHeaders").style.display = "none";
+                    document.getElementById("trackHeaders").style.display = "none";
+                    document.getElementById("genreHeaders").style.display = "table";
+
+                    // Appends Data
+                    for (let genre of data) {
+                        table.appendChild(createGenreTableRow(genre));
+                    }
+                }
+                else {
+                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                }
+            })
+        })
+        .catch(err => {
+            alert(err);
+        })
+});
+
 // Adds event listener for searching for an artist
 const artistForm = document.getElementById("artistSearch");
 artistForm.addEventListener("submit", (e) => {
@@ -22,6 +58,7 @@ artistForm.addEventListener("submit", (e) => {
                     // Toggles headers
                     document.getElementById("artistHeaders").style.display = "table";
                     document.getElementById("trackHeaders").style.display = "none";
+                    document.getElementById("genreHeaders").style.display = "none";
 
                     // Appends Data
                     for (let artist of data) {
@@ -64,6 +101,7 @@ trackForm.addEventListener("keypress", (e) => {
                         // Toggles Headers
                         document.getElementById("artistHeaders").style.display = "none";
                         document.getElementById("trackHeaders").style.display = "table";
+                        document.getElementById("genreHeaders").style.display = "none";
 
                         // Appends Data
                         for (let track of data) {
@@ -114,7 +152,6 @@ createListForm.addEventListener("submit", (e) => {
 
 // Adds event listener for updating list info on select
 const viewListSelect = document.getElementById("viewListSelect");
-
 viewListSelect.addEventListener("change", (e) => {
     // Clears current data
     let table = document.getElementById("infoTable");
@@ -138,6 +175,7 @@ viewListSelect.addEventListener("change", (e) => {
                         // Toggles Headers to display tracks
                         document.getElementById("artistHeaders").style.display = "none";
                         document.getElementById("trackHeaders").style.display = "table";
+                        document.getElementById("genreHeaders").style.display = "none";
 
                         // Appends fetchs track data for each track in the list
                         for (let track of data) {
@@ -417,6 +455,30 @@ function createArtistTableRow(artistData) {
     td = document.createElement("td");
     td.className = "artistAssociatedLabels";
     td.appendChild(document.createTextNode(artistData.artistAssociatedLabels));
+    tr.appendChild(td);
+
+    return tr;
+}
+
+function createGenreTableRow(genreData) {
+    let tr = document.createElement("tr");
+
+    // Adds artist id
+    td = document.createElement("td");
+    td.className = "genreID";
+    td.appendChild(document.createTextNode(genreData.genreID));
+    tr.appendChild(td);
+
+    // Adds artist name
+    td = document.createElement("td");
+    td.className = "genreName";
+    td.appendChild(document.createTextNode(genreData.genreTitle));
+    tr.appendChild(td);
+
+    // Adds artist location
+    td = document.createElement("td");
+    td.className = "genreParent";
+    td.appendChild(document.createTextNode(genreData.genreParent));
     tr.appendChild(td);
 
     return tr;

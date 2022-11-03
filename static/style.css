@@ -57,6 +57,27 @@ table#trackHeaders {
     height: 3vmax;
 }
 
+table#genreHeaders {
+    position: absolute;
+    top: 0px;
+    display: none;
+    height: 3vmax;
+}
+
+.genreID {
+    width: 5%;
+}
+
+.genreName {
+    width: 15%;
+    text-align: left;
+}
+
+.genreParent {
+    width: 5%;
+    text-align: left;
+}
+
 td {
     text-align: center;
     overflow-wrap: anywhere;

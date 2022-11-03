@@ -9,6 +9,7 @@
 
 <body onload="populateLists()">
     <div class="sideBar">
+        <button type="button" id="genresBtn">View Genres</button>
         <form id="artistSearch">
             <h2>Artists</h2>
             <label for="artistInput">Search by Artists:</label><br>
@@ -51,6 +52,13 @@
         </table>
     </div>
     <div class="topBar">
+        <table id="genreHeaders">
+            <tr>
+                <th class="genreID">#</th>
+                <th class="genreName">Genre</th>
+                <th class="genreParent">Parent #</th>
+            </tr>
+        </table>
         <table id="trackHeaders">
             <tr>
                 <th class="trackID">#</th>
