@@ -79,6 +79,41 @@ trackForm.addEventListener("keypress", (e) => {
     }
 });
 
+// Adds event listener for creating lists
+const createListForm = document.getElementById("createList");
+createListForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const listName = document.getElementById("listNameInput").value;
+
+    fetch("http://localhost:3000/api/lists", {
+        method: "POST",
+        body: JSON.stringify({
+            "listName": listName
+        }),
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    })
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                if (httpResp.ok) {
+                    
+                }
+                else {
+                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                }
+            })
+        })
+        .catch(err => {
+            alert(err);
+        })
+});
+
+function populateLists() {
+    
+}
+
 // returns a table row element for given track data
 function createTrackTableRow(trackData) {
     let tr = document.createElement("tr");
