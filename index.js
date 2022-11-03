@@ -310,7 +310,7 @@ listRouter.get('/:listName', (req, res) => {
                 return;
             }
         });
-        
+
     });
 });
 
@@ -411,6 +411,47 @@ listRouter.put('/:listName', (req, res) => {
     });
 });
 
+// Delete a list
+listRouter.delete('/:listName', (req, res) => {
+    // Input Validation
+    const schema = Joi.object({
+        listName: Joi.string().required()
+    });
+    const result = schema.validate(req.params);
+    if (result.error) {
+        res.status(400).json(result.error.details[0].message);
+        return;
+    }
+
+    const listName = req.params.listName;
+
+    db.query("SELECT listName FROM lists WHERE listName=? LIMIT 1", [listName], (err, data) => {
+        if (err) {
+            res.status(500).json(err);
+            return;
+        }
+        // if list doesn't exist
+        else if (data.length === 0) {
+            res.status(404).json("List Not Found");
+            return;
+        }
+
+        db.query("DELETE FROM lists WHERE listName=?", [listName], (err, data) => {
+            if (err) {
+                res.status(500).json(err);
+                return;
+            }
+
+            db.query("DELETE FROM listtrackdetails WHERE listName=?", [listName], (err) => {
+                if (err) {
+                    res.status(500).json(err);
+                    return;
+                }
+                res.json()
+            });
+        });
+    });
+});
 
 // Listening for requests on given port
 app.listen(port, () => {
