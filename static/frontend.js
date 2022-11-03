@@ -116,8 +116,14 @@ createListForm.addEventListener("submit", (e) => {
 const viewListSelect = document.getElementById("viewListSelect");
 const addTrackSelect = document.getElementById("listSelect");
 viewListSelect.addEventListener("change", (e) => {
-    document.getElementById("numTracks").textContent = "Tracks: " + lists.find(list => list.listName === viewListSelect.value).numTracks;
-    document.getElementById("totDuration").textContent = "Duration: " + lists.find(list => list.listName === viewListSelect.value).totalDuration;
+    if(viewListSelect.value !== "") {
+        document.getElementById("numTracks").textContent = "Tracks: " + lists.find(list => list.listName === viewListSelect.value).numTracks;
+        document.getElementById("totDuration").textContent = "Duration: " + lists.find(list => list.listName === viewListSelect.value).totalDuration;
+    }
+    else {
+        document.getElementById("numTracks").textContent = "Tracks: ";
+        document.getElementById("totDuration").textContent = "Duration: ";
+    }
 });
 
 // Populates list select boxes with data from the db
