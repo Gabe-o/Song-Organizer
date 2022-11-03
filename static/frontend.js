@@ -116,10 +116,63 @@ createListForm.addEventListener("submit", (e) => {
 const viewListSelect = document.getElementById("viewListSelect");
 const addTrackSelect = document.getElementById("listSelect");
 viewListSelect.addEventListener("change", (e) => {
-    if(viewListSelect.value !== "") {
+    // Clears current data
+    let table = document.getElementById("infoTable");
+    table.textContent = "";
+
+    // If a list is selected
+    if (viewListSelect.value !== "") {
         document.getElementById("numTracks").textContent = "Tracks: " + lists.find(list => list.listName === viewListSelect.value).numTracks;
         document.getElementById("totDuration").textContent = "Duration: " + lists.find(list => list.listName === viewListSelect.value).totalDuration;
+
+        // Sends request with query to fetch track ids for the selected list
+        fetch("http://localhost:3000/api/lists/" + viewListSelect.value, {
+            method: "GET",
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        })
+            .then(httpResp => {
+                return httpResp.json().then(data => {
+                    if (httpResp.ok) {
+                        // Toggles Headers to display tracks
+                        document.getElementById("artistHeaders").style.display = "none";
+                        document.getElementById("trackHeaders").style.display = "table";
+
+                        // Appends fetchs track data for each track in the list
+                        for (let track of data) {
+                            fetch("http://localhost:3000/api/tracks/" + track.trackID, {
+                                method: "GET",
+                                headers: new Headers({
+                                    'Content-Type': 'application/json'
+                                })
+                            })
+                                .then(httpResp => {
+                                    return httpResp.json().then(data => {
+                                        if (httpResp.ok) {
+                                            // Appends track data
+                                            table.appendChild(createTrackTableRow(data[0]));
+                                        }
+                                        else {
+                                            throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                                        }
+                                    })
+                                })
+                                .catch(err => {
+                                    throw err
+                                })
+                        }
+                    }
+                    else {
+                        throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                    }
+                })
+            })
+            .catch(err => {
+                alert(err);
+            })
     }
+    // If no list is selected clear these p elements
     else {
         document.getElementById("numTracks").textContent = "Tracks: ";
         document.getElementById("totDuration").textContent = "Duration: ";
