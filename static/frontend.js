@@ -1,3 +1,5 @@
+var lists = [];
+
 // Adds event listener for searching for an artist
 const artistForm = document.getElementById("artistSearch");
 artistForm.addEventListener("submit", (e) => {
@@ -98,7 +100,7 @@ createListForm.addEventListener("submit", (e) => {
         .then(httpResp => {
             return httpResp.json().then(data => {
                 if (httpResp.ok) {
-                    
+                    populateLists();
                 }
                 else {
                     throw new Error(httpResp.status + "\n" + JSON.stringify(data));
@@ -110,8 +112,47 @@ createListForm.addEventListener("submit", (e) => {
         })
 });
 
+// Populates list select boxes with data from the db
 function populateLists() {
-    
+    fetch("http://localhost:3000/api/lists", {
+        method: "GET",
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    })
+        .then(httpResp => {
+            return httpResp.json().then(data => {
+                if (httpResp.ok) {
+                    lists = data;
+                    document.getElementById("viewListSelect").textContent = "";
+                    document.getElementById("listSelect").textContent = "";
+
+                    document.getElementById("viewListSelect").appendChild(document.createElement("option"));
+                    document.getElementById("listSelect").appendChild(document.createElement("option"));
+
+                    for (let list of lists) {
+                        document.getElementById("viewListSelect").appendChild(createSelectOption(list));
+                        document.getElementById("listSelect").appendChild(createSelectOption(list));
+                    }
+                }
+                else {
+                    throw new Error(httpResp.status + "\n" + JSON.stringify(data));
+                }
+            })
+        })
+        .catch(err => {
+            alert(err);
+        })
+}
+
+// returns a select option element for given list data
+function createSelectOption(listData) {
+    let option = document.createElement("option");
+
+    option.value = listData.listName;
+    option.appendChild(document.createTextNode(listData.listName));
+
+    return option;
 }
 
 // returns a table row element for given track data
