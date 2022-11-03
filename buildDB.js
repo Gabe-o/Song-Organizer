@@ -251,7 +251,7 @@ function buildListsDB() {
         "CREATE TABLE lists (\n" +
         "listName VARCHAR(255) NOT NULL,\n" +
         "numTracks int DEFAULT NULL,\n" +
-        "totalDuration int DEFAULT NULL,\n" +
+        "totalDuration VARCHAR(100) DEFAULT NULL,\n" +
         "PRIMARY KEY (listName),\n" +
         "UNIQUE KEY listName_UNIQUE (listName));\n", (err) => {
             if (err) {
@@ -279,8 +279,7 @@ function buildListTrackDetailsDB() {
     db.query(
         "CREATE TABLE listTrackDetails (\n" +
         "listName VARCHAR(255) NOT NULL,\n" +
-        "trackID int NOT NULL,\n" +
-        "PRIMARY KEY (listName,trackID)\n);\n", (err) => {
+        "trackID int NOT NULL\n);\n", (err) => {
             if (err) {
                 throw err;
             }

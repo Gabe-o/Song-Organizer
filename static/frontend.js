@@ -275,6 +275,86 @@ addTrackform.addEventListener("submit", (e) => {
         })
 });
 
+// preparing frontend elements on load
+function onLoad() {
+    // Adds event listeners for sorting by table row
+    addColumnSorting(document.getElementById("genreHeaders"));
+    addColumnSorting(document.getElementById("trackHeaders"));
+    addColumnSorting(document.getElementById("artistHeaders"));
+    populateLists();
+}
+
+// Adds event listeners for sorting tables to all headers
+function addColumnSorting(table) {
+    let headers = table.rows[0].getElementsByTagName("th");
+    for (let i = 0; i < headers.length; i++) {
+        headers[i].addEventListener("click", (e) => {
+            sortTable(i);
+        });
+    }
+}
+
+// Sorts table by column n
+function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("infoTable");
+    switching = true;
+    dir = "asc";
+
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < rows.length; i++) {
+            shouldSwitch = false;
+            x = rows[i - 1].getElementsByTagName("td")[n];
+            y = rows[i].getElementsByTagName("td")[n];
+            if (dir == "asc") {
+                // If the content of the td is only numbers
+                if (/^\d+$/gm.test(x.innerHTML) && /^\d+$/gm.test(y.innerHTML)) {
+                    if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                        shouldSwitch = true;
+                        break;
+                      }
+                }
+                // Otherwise use this
+                else {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            else if (dir == "desc") {
+                // If the content of the td is only numbers
+                if (/^\d+$/gm.test(x.innerHTML) && /^\d+$/gm.test(y.innerHTML)) {
+                    if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                        shouldSwitch = true;
+                        break;
+                      }
+                }
+                // Otherwise use this
+                else {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i], rows[i - 1]);
+            switching = true;
+            switchcount++;
+        }
+        else {
+            if (switchcount == 0 && dir == "asc") {
+                dir = "desc";
+                switching = true;
+            }
+        }
+    }
+}
+
 // Populates list select boxes with data from the db
 function populateLists() {
     fetch("http://localhost:3000/api/lists", {
